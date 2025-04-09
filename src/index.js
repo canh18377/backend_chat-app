@@ -6,10 +6,7 @@ require('./config/passport');
 const cookieParser = require('cookie-parser');
 const verifyAccessToken = require('./middlewares/authMiddleware')
 const connectDB = require('./middlewares/connectDb')
-const authRoute = require('./routes/authRouter')
-const publicRoute = require('./routes/publicRoute')
-const privateRoute = require('./routes/privateRoute/index')
-const communalRoute = require('./routes/communalRouter')
+const authRoute = require('./routes/authRoute')
 const cors = require('cors')
 connectDB()
 const app = express();
@@ -38,10 +35,8 @@ app.use("/api", (req, res) => {
     res.json("kkkkkkkkk")
 })
 authRoute(app);
-publicRoute(app);
 app.use(verifyAccessToken)
-communalRoute(app)
-privateRoute(app)
+
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

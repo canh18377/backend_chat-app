@@ -1,9 +1,3 @@
-const {
-  responseCode,
-  statusCode,
-  responseMessage,
-  sendResponse
-} = require('../utils/responseCode');
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const secretAccessToken = process.env.ACCESS_TOKEN_SECRET
@@ -16,10 +10,8 @@ const authenticate = (req, res, next) => {
       req.user = decoded;
       return next();
     } catch (error) {
-      return sendResponse(res, responseCode.unauthorized, statusCode.fail, {}, "Invalid token");
     }
   }
-  return sendResponse(res, responseCode.unauthorized, statusCode.fail, {}, "Unauthorized");
 };
 
 module.exports = authenticate
