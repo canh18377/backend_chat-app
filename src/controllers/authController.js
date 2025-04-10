@@ -9,35 +9,15 @@ const generateAccessToken = (user) => {
 
 class authController {
     authFB(req, res) {
-        console.log("auth fb 1")
-
         passport.authenticate('facebook')(req, res);
     }
     authGG(req, res) {
-        console.log("auth google k")
         passport.authenticate('google', { scope: ['profile', 'email'] })(req, res);
     }
     async responseAfterAuth(req, res) {
         try {
-            const { accessToken, refreshToken, user } = req.user;
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,   // Bảo vệ chống XSS
-                secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS khi production
-                sameSite: 'Strict', // Bảo vệ chống CSRF
-            });
-            const role = await roleSchema.findOne({ idUser: user.idUser })
-            // Gửi Access Token về React qua postMessage
-            res.send(`
-                <script>
-                  window.opener.postMessage({
-                    accessToken: '${accessToken}',
-                    role: '${role.role}',
-                    idUser:'${user.idUser}'
-                  }, 'http://localhost:3000');
-                  window.close();
-                </script>
-              `);
-
+            const { redirectUrl } = req.user;
+            res.redirectUrl(redirectUrl)
         }
         catch (error) {
             console.error('Error during authentication', error);

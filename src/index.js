@@ -30,11 +30,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, "src", 'uploads')));
 app.use(passport.initialize());
-app.use("/api", (req, res, next) => {
-    console.log("run")
-    console.log(req.originalUrl)
-    next()
-})
 authRoute(app);
 app.use(verifyAccessToken)
 

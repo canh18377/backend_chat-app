@@ -26,16 +26,12 @@ passport.use(new FacebookStrategy({
             }
             // Tạo Access Token và Refresh Token
             const generatedAccessToken = jwt.sign(
-                { idUser: user.idUser, role: role.role },
+                { idUser: user.idUser },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '15m' }
-            );
-            const generatedRefreshToken = jwt.sign(
-                { idUser: user.idUser, role: role.role },
-                process.env.REFRESH_TOKEN_SECRET
             );
             // Trả về token
-            done(null, { accessToken: generatedAccessToken, refreshToken: generatedRefreshToken, user: user });
+            const redirectUrl = `ChatApp://auth/facebook?token=${generatedAccessToken}`;
+            done(null, { redirectUrl });
         } catch (err) {
             console.error("Lỗi khi xác thực Facebook:", err);
             return done(err);
@@ -65,14 +61,10 @@ passport.use(new GoogleStrategy({
             const generatedAccessToken = jwt.sign(
                 { idUser: user.idUser },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '15m' }
-            );
-            const generatedRefreshToken = jwt.sign(
-                { idUser: user.idUser },
-                process.env.REFRESH_TOKEN_SECRET
             );
             // Trả về token
-            done(null, { accessToken: generatedAccessToken, refreshToken: generatedRefreshToken, user: user });
+            const redirectUrl = `ChatApp://auth/google?token=${generatedAccessToken}`;
+            done(null, { redirectUrl });
         } catch (err) {
             console.error("Lỗi khi xác thực Facebook:", err);
             return done(err);
