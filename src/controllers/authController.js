@@ -9,9 +9,12 @@ const generateAccessToken = (user) => {
 
 class authController {
     authFB(req, res) {
+        console.log("auth fb 1")
+
         passport.authenticate('facebook')(req, res);
     }
     authGG(req, res) {
+        console.log("auth google k")
         passport.authenticate('google', { scope: ['profile', 'email'] })(req, res);
     }
     async responseAfterAuth(req, res) {

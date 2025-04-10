@@ -4,9 +4,9 @@ const passport = require('passport');
 const router = express.Router();
 const authController = require('../../controllers/authController')
 router.get('/facebook', authController.authFB);
-router.get('/google', (req, res) => {
+router.get('/google', (req, res, next) => {
     console.log("auth google")
-    res.next()
+    next()
 })
     , authController.authGG;
 router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/', session: false }), authController.responseAfterAuth);
