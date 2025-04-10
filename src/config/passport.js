@@ -30,7 +30,7 @@ passport.use(new FacebookStrategy({
                 process.env.ACCESS_TOKEN_SECRET,
             );
             // Trả về token
-            const redirectUrl = `ChatApp://auth/facebook?token=${generatedAccessToken}`;
+            const redirectUrl = `chatapp://auth/facebook?token=${generatedAccessToken}`;
             done(null, { redirectUrl });
         } catch (err) {
             console.error("Lỗi khi xác thực Facebook:", err);
