@@ -18,6 +18,7 @@ class authController {
         console.log("11")
         try {
             const { redirectUrl } = req.user;
+            console.log(redirectUrl)
             res.redirect(redirectUrl);
         }
         catch (error) {

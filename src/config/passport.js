@@ -63,7 +63,7 @@ passport.use(new GoogleStrategy({
                 process.env.ACCESS_TOKEN_SECRET,
             );
             // Trả về token
-            const redirectUrl = `ChatApp://auth/google?token=${generatedAccessToken}`;
+            const redirectUrl = `chatapp://auth/google?token=${generatedAccessToken}`;
             done(null, { redirectUrl });
         } catch (err) {
             console.error("Lỗi khi xác thực Facebook:", err);
