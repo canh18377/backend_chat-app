@@ -32,7 +32,6 @@ app.use('/uploads', express.static(path.join(__dirname, "src", 'uploads')));
 app.use(passport.initialize());
 app.use("/api", (req, res) => {
     console.log("run")
-    res.json("kkkkkkkkk")
 })
 authRoute(app);
 app.use(verifyAccessToken)
