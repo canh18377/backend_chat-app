@@ -7,7 +7,7 @@ require('dotenv').config();
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: "https://backend-chat-app-4.onrender.com/api/auth/facebook/callback",
+    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
     profileFields: ['id', 'displayName', 'emails', 'photos'],
     enableProof: true
 },
@@ -42,7 +42,7 @@ passport.use(new FacebookStrategy({
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://backend-chat-app-4.onrender.com/api/auth/google/callback"
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
 },
     async (accessToken, refreshToken, profile, done) => {
         try {

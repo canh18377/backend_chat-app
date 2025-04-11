@@ -15,11 +15,10 @@ class authController {
         passport.authenticate('google', { scope: ['profile', 'email'] })(req, res);
     }
     async responseAfterAuth(req, res) {
-        console.log("11")
         try {
             const { redirectUrl } = req.user;
             console.log(redirectUrl)
-            res.redirect(redirectUrl);
+            res.json(redirectUrl);
         }
         catch (error) {
             console.error('Error during authentication', error);
