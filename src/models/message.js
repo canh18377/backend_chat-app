@@ -20,20 +20,10 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    type: {
-        type: String,
-        enum: ['text', 'image', 'video', 'file'],
-        default: 'text'
-    },
     timestamp: {
         type: Date,
         default: Date.now
     },
-    status: {
-        type: String,
-        enum: ['sent', 'delivered', 'read'],
-        default: 'sent'
-    }
 });
 
 module.exports = mongoose.model('Message', MessageSchema);
