@@ -17,11 +17,12 @@ passport.use(new FacebookStrategy({
             let user = await User.findOne({ idUser: profile.id });
             if (!user) {
                 // Nếu chưa tồn tại thì tạo mới
+                let email=  profile.emails&& profile.emails[0].value ||null
                 user = await User.create({
                     idUser: profile.id,
                     name: profile.displayName,
                     avatar: profile.photos[0]?.value || null,
-                    email: profile.emails[0]?.value || null
+                    email:email
                 });
             }
             // Tạo Access Token và Refresh Token
