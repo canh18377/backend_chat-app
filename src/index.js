@@ -22,9 +22,8 @@ config_websoket(server)
 app.use('/uploads', express.static(path.join(__dirname, "src", 'uploads')));
 app.use(passport.initialize());
 authRoute(app);
-private_route(app)
 app.use(verifyAccessToken)
-
+private_route(app)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 const PORT = process.env.PORT || 5000;
