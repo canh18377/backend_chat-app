@@ -17,8 +17,7 @@ class authController {
     async responseAfterAuth(req, res) {
         try {
             const { redirectUrl } = req.user;
-            console.log(redirectUrl)
-            res.json(redirectUrl);
+            res.redirect(redirectUrl);
         }
         catch (error) {
             console.error('Error during authentication', error);

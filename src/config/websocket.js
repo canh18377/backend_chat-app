@@ -54,7 +54,6 @@ const config_websoket = (server) => {
             const isGroup = true
             messageController.createMessage(senderId, receiverIds, message, isGroup, groupName, groupAvatar)
                 .then((newMessage) => {
-                    // Cập nhật tin nhắn cuối cùng trong Conversation nhóm
                     Conversation.findOneAndUpdate(
                         { name: groupName, participants: { $all: receiverIds } },
                         { $set: { lastMessage: newMessage._id } },
