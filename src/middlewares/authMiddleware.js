@@ -10,6 +10,7 @@ const authenticate = (req, res, next) => {
       req.user = decoded;
       return next();
     } catch (error) {
+      res.status(404).json("not found")
     }
   }
 };
