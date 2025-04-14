@@ -7,7 +7,7 @@ class conversationController {
         console.log(req.user.idUser)
         console.log(typeof req.user.idUser)
         try {
-            const user = await User.findById(req.user.idUser)
+            const user = await User.findOne({ idUser: req.user.idUser })
             if (!user) {
                 res.status(404).json("not found user");
             }
