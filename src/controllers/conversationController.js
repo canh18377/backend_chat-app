@@ -4,15 +4,16 @@ const messages = require("../models/message");
 class conversationController {
     // Lấy thông tin người dùng hiện tại
     getConversations = async (req, res) => {
+        console.log(req.user.idUser)
         try {
             const user = await User.findById(req.user.idUser)
             if (!user) {
-                res.status(404).json("not found");
+                res.status(404).json("not found user");
             }
             const conversations = await conversation.find({ participants: { $in: [req.user.idUser] } });
 
             if (!conversations || conversations.length === 0) {
-                return res.status(404).json("not found");
+                return res.status(404).json("not found conversation");
             }
             const results = [];
             for (const conv of conversations) {
