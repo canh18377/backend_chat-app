@@ -12,6 +12,8 @@ const authenticate = (req, res, next) => {
     } catch (error) {
       res.status(404).json("not found")
     }
+  } else {
+    res.status(404).json("unAuth")
   }
 };
 
