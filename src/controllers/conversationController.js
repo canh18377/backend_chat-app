@@ -5,6 +5,7 @@ class conversationController {
     // Lấy thông tin người dùng hiện tại
     getConversations = async (req, res) => {
         console.log(req.user.idUser)
+        console.log(typeof req.user.idUser)
         try {
             const user = await User.findById(req.user.idUser)
             if (!user) {
@@ -28,6 +29,7 @@ class conversationController {
             }
             res.json(results);
         } catch (err) {
+            console.log(err)
             res.status(500).json({ message: err.message });
         }
     };
