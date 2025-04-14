@@ -12,7 +12,6 @@ class conversationController {
             if (conversations) {
                 res.json(conversations);
             } else res.status(404).json("not found");
-
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
