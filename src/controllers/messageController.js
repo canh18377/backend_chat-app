@@ -6,7 +6,7 @@ class message {
         try {
             // Lấy conversationId từ request
             const { conversationId } = req.params; // Sử dụng req.params nếu nó được truyền qua URL, hoặc req.body nếu từ body
-
+            console.log(conversationId)
             // Kiểm tra xem có conversationId không
             if (!conversationId) {
                 return res.status(400).json({ message: "Conversation ID is required" });
