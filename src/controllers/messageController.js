@@ -13,7 +13,7 @@ class message {
             }
 
             // Truy vấn tất cả tin nhắn liên quan đến conversationId
-            const messages = await Message.find({ conversationId })
+            const messages = await Message.find({ conversationId: conversationId })
                 .sort({ timestamp: 1 }) // Sắp xếp theo thứ tự thời gian
                 .exec();
 
