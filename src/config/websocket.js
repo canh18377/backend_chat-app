@@ -28,9 +28,11 @@ const config_websoket = (server) => {
         });
 
         // Xử lý tin nhắn riêng
-        socket.on('private_message', ({ senderId, receiverId, message }) => {
-            messageController.createMessage(senderId, receiverId, message);
-
+        socket.on('private_message', async ({ senderId, receiverId, message }) => {
+            const newMessage = await messageController.createMessage(senderId, receiverId, message);
+            if (newMessage) {
+                socket.emit("receive_message", newMessage)
+            }
             const receiverSocketId = userSocketMap[receiverId];
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit('receive_message', {
