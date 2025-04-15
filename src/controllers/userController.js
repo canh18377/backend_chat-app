@@ -4,7 +4,10 @@ class userController {
     // Lấy thông tin người dùng hiện tại
     getCurrentUser = async (req, res) => {
         try {
-            const user = await User.findById(req.user.idUser).select('-password');
+            const user = await User.findById(req.user.idUser);
+            if (user.password) {
+                delete user.password
+            }
             res.json(user);
         } catch (err) {
             res.status(500).json({ message: err.message });
