@@ -19,7 +19,7 @@ class message {
             console.log(messages)
             // Kiểm tra xem có tin nhắn nào không
             if (!messages || messages.length === 0) {
-                return res.status(404).json([]);
+                return res.json([]);
             }
 
             // Trả về danh sách tin nhắn
