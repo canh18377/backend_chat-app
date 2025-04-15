@@ -9,6 +9,10 @@ class message {
                 return res.status(400).json({ message: "Conversation ID is required" });
             }
             const conversationObjectId = new mongoose.Types.ObjectId(conversationId.trim());
+            console.log(conversationObjectId)
+            const msa = await Message.find()
+            console.log(msa)
+            console.log(msa[0].conversationId === conversationId)
             const messages = await Message.find({ conversationId: conversationObjectId }).sort({ timestamp: 1 }).lean();
 
             if (!messages || messages.length === 0) {
