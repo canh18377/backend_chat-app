@@ -15,13 +15,11 @@ class message {
             // Truy vấn tất cả tin nhắn liên quan đến conversationId
             const messages = await Message.find({ conversationId: conversationId })
                 .sort({ timestamp: 1 }) // Sắp xếp theo thứ tự thời gian
-                .exec();
             console.log(messages)
             // Kiểm tra xem có tin nhắn nào không
             if (!messages || messages.length === 0) {
                 return res.json([]);
             }
-
             // Trả về danh sách tin nhắn
             return res.status(200).json({ messages });
         } catch (error) {
