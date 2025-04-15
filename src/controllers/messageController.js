@@ -12,7 +12,7 @@ class message {
             console.log(conversationObjectId)
             const msa = await Message.find()
             console.log(msa)
-            console.log(msa[0].conversationId === conversationId)
+            console.log(msa[0].conversationId === conversationObjectId)
             const messages = await Message.find({ conversationId: conversationObjectId }).sort({ timestamp: 1 }).lean();
 
             if (!messages || messages.length === 0) {
