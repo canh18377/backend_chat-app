@@ -8,11 +8,9 @@ class message {
             if (!conversationId) {
                 return res.status(400).json({ message: "Conversation ID is required" });
             }
-
             const messages = await Message.find({ conversationId: conversationId })
                 .sort({ timestamp: 1 }).lean()// Sắp xếp theo thứ tự thời gian
-            console.log(messages)
-            return res.status(200).json({ messages });
+            return res.status(200).json(messages);
         } catch (error) {
             console.error("Error fetching messages:", error);
             return res.status(500).json({ message: "Internal server error" });
