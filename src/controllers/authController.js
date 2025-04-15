@@ -37,7 +37,7 @@ class authController {
     async Register(req, res) {
         try {
             const { email, password, userName } = req.body
-            const user = User.findOne({ email: email })
+            const user = await User.findOne({ email: email })
             if (user) {
                 res.status(401).json("user exits")
             } else {
