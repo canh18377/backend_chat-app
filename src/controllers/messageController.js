@@ -16,7 +16,7 @@ class message {
             const messages = await Message.find({ conversationId: conversationId })
                 .sort({ timestamp: 1 }) // Sắp xếp theo thứ tự thời gian
                 .exec();
-
+            console.log(messages)
             // Kiểm tra xem có tin nhắn nào không
             if (!messages || messages.length === 0) {
                 return res.status(404).json([]);
