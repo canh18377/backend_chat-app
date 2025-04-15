@@ -4,11 +4,10 @@ class userController {
     // Lấy thông tin người dùng hiện tại
     getCurrentUser = async (req, res) => {
         try {
-            const user = await User.findById(req.user.idUser);
-            if (user.password) {
-                delete user.password
-            }
-            res.json(user);
+            const user = await User.findOne({ idUser: req.user.idUser });
+            const plainUser = user.toObject(); // hoặc user.toJSON()
+            delete plainUser.password;
+            res.json(plainUser);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }

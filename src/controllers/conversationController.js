@@ -22,8 +22,9 @@ class conversationController {
                 } else {
                     const receiverId = conv.participants.find(id => id !== req.user.idUser);
                     const user = await User.findOne({ idUser: receiverId });
-                    delete user.password;
-                    results.push({ conversation: conv, lastMessage, user });
+                    const plainUser = user.toObject(); // hoặc user.toJSON()
+                    delete plainUser.password;
+                    results.push({ conversation: conv, lastMessage, plainUser });
                 }
             }
             res.json(results);
