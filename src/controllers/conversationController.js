@@ -4,8 +4,6 @@ const messages = require("../models/message");
 class conversationController {
     // Lấy thông tin người dùng hiện tại
     getConversations = async (req, res) => {
-        console.log(req.user.idUser)
-        console.log(typeof req.user.idUser)
         try {
             const user = await User.findOne({ idUser: req.user.idUser })
             if (!user) {
