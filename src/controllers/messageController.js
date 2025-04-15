@@ -9,7 +9,7 @@ class message {
                 return res.status(400).json({ message: "Conversation ID is required" });
             }
             const messages = await Message.find({ conversationId: conversationId })
-                .sort({ timestamp: 1 }).lean()// Sắp xếp theo thứ tự thời gian
+                .sort({ timestamp: -1 }).lean()// Sắp xếp theo thứ tự thời gian
             return res.status(200).json(messages);
         } catch (error) {
             console.error("Error fetching messages:", error);
