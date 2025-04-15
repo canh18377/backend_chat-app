@@ -6,16 +6,20 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    name: String,
+    name: { type: String, default: "User" },
     email: {
         type: String,
         lowercase: true,
         trim: true
     },
-    avatar: String,
+    avatar: { type: String, default: null },
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    pasword: {
+        type: String,
+        default: null
     },
     timestamp: {
         type: Date,
