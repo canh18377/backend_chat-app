@@ -17,10 +17,15 @@ class userController {
     getUser = async (req, res) => {
         const { searchBy } = req.params;
         try {
-            const users = await User.find({
+            const data = await User.find({
                 name: { $regex: searchBy, $options: "i" }
             });
-            res.json(users);
+            const users = data.map(user => {
+                const plainUser = user.toObject()
+                delete plainUser.password;
+                return plainUser
+            })
+            res.status(200).json(users);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
