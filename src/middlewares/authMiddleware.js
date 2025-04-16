@@ -11,6 +11,7 @@ const authenticate = (req, res, next) => {
       req.user = decoded;
       return next();
     } catch (error) {
+      console.log(error)
       res.status(404).json("Failed Auth")
     }
   } else {
