@@ -27,7 +27,6 @@ const config_websoket = (server) => {
             }
         });
 
-        // Xử lý tin nhắn riêng
         socket.on('private_message', async ({ senderId, receiverId, message }) => {
             const newMessage = await messageController.createMessage(senderId, receiverId, message);
             if (newMessage) {
@@ -50,7 +49,6 @@ const config_websoket = (server) => {
             }
         });
 
-        // Xử lý tin nhắn nhóm
         socket.on('group_message', ({ senderId, receiverIds, message, groupName, groupAvatar }) => {
             // Lưu tin nhắn nhóm vào cơ sở dữ liệu
             const isGroup = true

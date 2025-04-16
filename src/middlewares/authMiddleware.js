@@ -2,6 +2,7 @@ require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const secretAccessToken = process.env.ACCESS_TOKEN_SECRET
 const authenticate = (req, res, next) => {
+  console.log(req.originalUrl)
   const token = req.headers['authorization']
   if (token) {
     const accessToken = token.split(" ")[1]

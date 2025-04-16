@@ -21,10 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 config_websoket(server)
 app.use('/uploads', express.static(path.join(__dirname, "src", 'uploads')));
 app.use(passport.initialize());
-app.use("/", (req, res, next) => {
-    console.log(req.originalUrl)
-    next()
-})
 authRoute(app);
 app.use(verifyAccessToken)
 private_route(app)
