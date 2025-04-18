@@ -28,6 +28,30 @@ class friendShip {
             res.status(500).json({ message: err.message });
         }
     };
+    getListFriendRequest = async (req, res) => {
+        const recipientId = req.user.idUser; // bạn cần middleware auth để có req.user
+
+        try {
+            const list = await Friendship.find({ recipient: recipientId, status: "pending" })
+            res.status(201).json(list);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+    getSentFriendRequests = async (req, res) => {
+        const requesterId = req.user._id;
+
+        try {
+            const list = await Friendship.find({
+                requester: requesterId,
+                status: 'pending'
+            }).populate('recipient', 'name avatar');
+
+            res.status(200).json(list);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    };
 
     // Chấp nhận lời mời kết bạn
     acceptRequest = async (req, res) => {
