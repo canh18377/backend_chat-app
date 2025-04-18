@@ -1,4 +1,5 @@
 const Friendship = require('../models/friendShip');
+const User = require('../models/user')
 class friendShip {
 
     // Gửi lời mời kết bạn
@@ -36,12 +37,38 @@ class friendShip {
         const recipientId = req.user.idUser; // bạn cần middleware auth để có req.user
 
         try {
-            const list = await Friendship.find({ recipient: recipientId, status: "pending" })
-            res.status(201).json(list);
+            // Tìm kiếm các yêu cầu kết bạn với trạng thái "pending" mà người dùng là người nhận
+            const list = await Friendship.find({ recipient: recipientId, status: "pending" });
+
+            // Lấy thông tin người gửi yêu cầu kết bạn
+            const detailedList = await Promise.all(list.map(async (friendRequest) => {
+                // Tìm thông tin người gửi yêu cầu kết bạn
+                const requester = await User.findOne({ idUser: friendRequest.requester });
+
+                if (requester) {
+                    // Loại bỏ các trường không cần thiết (password và email)
+                    const { password, email, ...exclusiveField } = requester.toObject();
+                    return {
+                        ...friendRequest.toObject(),
+                        requester: exclusiveField  // Thêm thông tin người gửi
+                    };
+                }
+
+                // Nếu không tìm thấy người gửi, trả về null
+                return {
+                    ...friendRequest.toObject(),
+                    requester: null
+                };
+            }));
+
+            // Trả về danh sách yêu cầu kết bạn nhận được cùng với thông tin người gửi
+            res.status(200).json(detailedList);
         } catch (err) {
+            // Xử lý lỗi khi có sự cố trong quá trình truy vấn
             res.status(500).json({ message: err.message });
         }
-    }
+    };
+
     getSentFriendRequests = async (req, res) => {
         const requesterId = req.user.idUser;
 
@@ -49,13 +76,32 @@ class friendShip {
             const list = await Friendship.find({
                 requester: requesterId,
                 status: 'pending'
-            }).populate('recipient', 'name avatar');
+            });
 
-            res.status(200).json(list);
+            const detailedList = await Promise.all(list.map(async (friendRequest) => {
+                const recipient = await User.findOne({ idUser: friendRequest.recipient });
+
+                if (recipient) {
+                    const { password, email, ...exclusiveField } = recipient.toObject(); // Loại bỏ password và email
+                    return {
+                        ...friendRequest.toObject(),
+                        recipient: exclusiveField  // Thêm thông tin người nhận
+                    };
+                }
+
+                return {
+                    ...friendRequest.toObject(),
+                    recipient: null
+                };
+            }));
+
+            res.status(200).json(detailedList);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
     };
+
+
 
     // Chấp nhận lời mời kết bạn
     acceptRequest = async (req, res) => {
