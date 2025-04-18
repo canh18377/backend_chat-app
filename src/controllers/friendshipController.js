@@ -43,7 +43,7 @@ class friendShip {
         }
     }
     getSentFriendRequests = async (req, res) => {
-        const requesterId = req.user._id;
+        const requesterId = req.user.idUser;
 
         try {
             const list = await Friendship.find({
