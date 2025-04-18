@@ -1,5 +1,6 @@
 const { Server } = require('socket.io');
 const messageController = require("../controllers/messageController");
+const call = require("../controllers/callController")
 const userSocketMap = {}; // userId -> socket.id
 const pendingMessages = {}; // userId -> [ { senderId, message } ]
 
@@ -83,7 +84,28 @@ const config_websoket = (server) => {
                     console.error('Error creating group message:', err);
                 });
         });
+        socket.on("start_call_audio", async ({ toUserId, fromUserId }) => {
+            const result = await call.call_start({ toUserId, fromUserId });
 
+            const { channelName, from, to } = result;
+
+            // Gửi token + channel cho người gọi
+            socket.emit("receive_token", {
+                channelName,
+                uid: from.uid,
+                token: from.token
+            });
+
+            // Gửi token + channel cho người nhận nếu họ đang online
+            const toSocketId = userSocketMap[toUserId];
+            if (toSocketId) {
+                io.to(toSocketId).emit("receive_token", {
+                    channelName,
+                    uid: to.uid,
+                    token: to.token
+                });
+            }
+        });
         socket.on('disconnect', () => {
             const userId = Object.keys(userSocketMap).find(
                 (key) => userSocketMap[key] === socket.id
