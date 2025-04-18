@@ -7,6 +7,10 @@ class friendShip {
         const requesterId = req.user.idUser; // bạn cần middleware auth để có req.user
 
         try {
+            if (recipientId === requesterId) {
+                res.status(400).json("request Invalid")
+                return
+            }
             // Kiểm tra đã có yêu cầu trước đó chưa
             const existing = await Friendship.findOne({
                 requester: requesterId,
