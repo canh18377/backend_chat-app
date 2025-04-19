@@ -97,8 +97,6 @@ const config_websoket = (server) => {
                 channelName,
                 uid: from.uid,
                 token: from.token,
-                callerName: caller.name,
-                callerAvatar: caller.avatar,
                 receiverName: receiver.name,
                 receiverAvatar: receiver.avatar
             });
@@ -109,7 +107,9 @@ const config_websoket = (server) => {
                 io.to(toSocketId).emit("receive_token", {
                     channelName,
                     uid: to.uid,
-                    token: to.token
+                    token: to.token,
+                    callerName: caller.name,
+                    callerAvatar: caller.avatar,
                 });
             }
         });
