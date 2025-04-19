@@ -1,5 +1,6 @@
 const { Server } = require('socket.io');
 const messageController = require("../controllers/messageController");
+const User = require("../models/user")
 const call = require("../controllers/callController")
 const userSocketMap = {}; // userId -> socket.id
 const pendingMessages = {}; // userId -> [ { senderId, message } ]
@@ -89,11 +90,17 @@ const config_websoket = (server) => {
 
             const { channelName, from, to } = result;
 
-            // Gửi token + channel cho người gọi
+            const caller = await User.findOne({ idUser: fromUserId })
+            const receiver = await User.findOne({ idUser: toUserId })
+
             socket.emit("receive_token", {
                 channelName,
                 uid: from.uid,
-                token: from.token
+                token: from.token,
+                callerName: caller.name,
+                callerAvatar: caller.avatar,
+                receiverName: receiver.name,
+                receiverAvatar: receiver.avatar
             });
 
             // Gửi token + channel cho người nhận nếu họ đang online
