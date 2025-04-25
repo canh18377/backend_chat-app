@@ -37,8 +37,7 @@ const config_websoket = (server) => {
             const receiverSocketId = userSocketMap[receiverId];
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit('receive_message', {
-                    senderId,
-                    message,
+                    newMessage
                 });
                 console.log(`📤 ${senderId} -> ${receiverId}: ${message}`);
             } else {
