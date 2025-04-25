@@ -36,9 +36,9 @@ const config_websoket = (server) => {
             }
             const receiverSocketId = userSocketMap[receiverId];
             if (receiverSocketId) {
-                io.to(receiverSocketId).emit('receive_message', {
+                io.to(receiverSocketId).emit('receive_message',
                     newMessage
-                });
+                );
                 console.log(`📤 ${senderId} -> ${receiverId}: ${message}`);
             } else {
                 // Người nhận chưa online → lưu vào pendingMessages
