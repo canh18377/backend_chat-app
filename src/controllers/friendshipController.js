@@ -162,18 +162,26 @@ class friendShip {
 
             // Lấy thông tin của requester và recipient từ User model
             const friendDetails = await Promise.all(friends.map(async (friendship) => {
-                const requester = await User.findById(friendship.requester);
-                const recipient = await User.findById(friendship.recipient);
+                const requester = await User.findOne({ idUser: friendship.requester });
+                const recipient = await User.findOne({ idUser: friendship.recipient });
+
+                const requesterObj = requester?.toObject();
+                const recipientObj = recipient?.toObject();
+
+                if (requesterObj) delete requesterObj.password;
+                if (recipientObj) delete recipientObj.password;
+
                 return {
                     ...friendship.toObject(),
-                    requester,
-                    recipient,
+                    requester: requesterObj,
+                    recipient: recipientObj,
                 };
             }));
 
             res.json(friendDetails);
 
         } catch (err) {
+            console.log(err);
             res.status(500).json({ message: err.message });
         }
     };
