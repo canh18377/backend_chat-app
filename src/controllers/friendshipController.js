@@ -158,9 +158,12 @@ class friendShip {
                     { requester: userId, status: 'accepted' },
                     { recipient: userId, status: 'accepted' }
                 ]
-            }).populate('requester recipient');
+            })
+                .populate({ path: 'requester', select: '-password' })
+                .populate({ path: 'recipient', select: '-password' });
 
             res.json(friends);
+
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
