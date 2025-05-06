@@ -4,18 +4,38 @@ const Conversation = require('../models/conversation'); // Model Conversation
 class message {
     async getMessage(req, res) {
         try {
-            const { conversationId } = req.params;
-            if (!conversationId) {
-                return res.status(400).json({ message: "Conversation ID is required" });
+            const idUser = req.user.idUser;
+            const { data, exist } = req.params;
+
+            let conversationId;
+
+            if (exist === 'false') {
+                // Parse data thành mảng participants
+                const participants = JSON.parse(data);
+
+                const conversation = await Conversation.create({
+                    participants: [idUser, ...participants],
+                    isGroup: false
+                });
+
+                conversationId = conversation._id;
+            } else {
+                // exist === 'true', thì data chính là conversationId
+                conversationId = data;
             }
-            const messages = await Message.find({ conversationId: conversationId })
-                .sort({ timestamp: -1 }).lean()// Sắp xếp theo thứ tự thời gian
+
+            // Lấy danh sách tin nhắn
+            const messages = await Message.find({ conversationId })
+                .sort({ timestamp: -1 })
+                .lean();
+
             return res.status(200).json(messages);
         } catch (error) {
             console.error("Error fetching messages:", error);
             return res.status(500).json({ message: "Internal server error" });
         }
     }
+
 
     createMessage = async (senderId, receiverId, message, isGroup = false, groupName = '', groupAvatar = '') => {
         try {
