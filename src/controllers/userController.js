@@ -1,3 +1,5 @@
+const conversation = require('../models/conversation');
+const friendShip = require('../models/friendShip');
 const User = require('../models/user');
 const { uploadImage } = require('../utils/upload_to_cloudinary')
 class userController {
@@ -16,24 +18,45 @@ class userController {
     // Tìm kiếm người dùng theo tên
     getUser = async (req, res) => {
         const { searchBy } = req.params;
+        const currentUserId = req.user.idUser; // cần middleware auth gán req.user
+
         try {
-            const data = await User.find({
-                name: { $regex: searchBy, $options: "i" }
-            })
-            let users = []
-            if (data.length !== 0) {
-                users = data.map(user => {
-                    const plainUser = user.toObject()
-                    delete plainUser.password;
-                    return plainUser
-                })
-            }
-            res.status(200).json(users);
+            const users = await User.find({
+                name: { $regex: searchBy, $options: "i" },
+                idUser: { $ne: currentUserId } // không trả chính bản thân
+            });
+
+            const result = await Promise.all(users.map(async user => {
+                const plainUser = user?.toObject();
+                delete plainUser.password;
+
+                // Kiểm tra bạn bè
+                const friendship = await friendShip.findOne({
+                    $or: [
+                        { requester: currentUserId, recipient: user?.idUser },
+                        { requester: user?.idUser, recipient: currentUserId }
+                    ],
+                    status: 'accepted'
+                });
+
+                // Kiểm tra cuộc trò chuyện
+                const conversation = await conversation.findOne({
+                    participants: { $all: [currentUserId.toString(), user?.idUser.toString()] },
+                    isGroup: false
+                });
+
+                return {
+                    ...plainUser,
+                    isFriend: !!friendship,
+                    hasConversation: !!conversation
+                };
+            }));
+
+            res.status(200).json(result);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
-    };
-
+    }
     // Cập nhật thông tin người dùng
     updateUser = async (req, res) => {
         const idUser = req.user.idUser
