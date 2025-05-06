@@ -19,12 +19,15 @@ class userController {
         try {
             const data = await User.find({
                 name: { $regex: searchBy, $options: "i" }
-            });
-            const users = data.map(user => {
-                const plainUser = user.toObject()
-                delete plainUser.password;
-                return plainUser
             })
+            let users = []
+            if (data.length !== 0) {
+                users = data.map(user => {
+                    const plainUser = user.toObject()
+                    delete plainUser.password;
+                    return plainUser
+                })
+            }
             res.status(200).json(users);
         } catch (err) {
             res.status(500).json({ message: err.message });
