@@ -40,7 +40,7 @@ class userController {
                 });
 
                 // Kiểm tra cuộc trò chuyện
-                const conversation = await conversation.findOne({
+                const conv = await conversation.findOne({
                     participants: { $all: [currentUserId.toString(), user?.idUser.toString()] },
                     isGroup: false
                 });
@@ -48,7 +48,7 @@ class userController {
                 return {
                     ...plainUser,
                     isFriend: !!friendship,
-                    hasConversation: !!conversation
+                    hasConversation: !!conv
                 };
             }));
 
