@@ -1,5 +1,5 @@
 const User = require('../models/user');
-
+const { uploadImage } = require('../utils/upload_to_cloudinary')
 class userController {
     // Lấy thông tin người dùng hiện tại
     getCurrentUser = async (req, res) => {
@@ -36,8 +36,12 @@ class userController {
 
     // Cập nhật thông tin người dùng
     updateUser = async (req, res) => {
+        const idUser = req.user.idUser
+        const { name, email } = req.body
+        const images = req.files?.avatar || [];
+        const imageUrls = await Promise.all(images.map((img) => uploadImage(img.path)))
         try {
-            const updated = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
+            const updated = await User.findOneAndUpdate({ idUser: idUser }, { name: name, email: email, avatar: imageUrls[0] });
             res.json(updated);
         } catch (err) {
             res.status(500).json({ message: err.message });
