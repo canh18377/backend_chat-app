@@ -36,7 +36,7 @@ class userController {
                         { requester: currentUserId, recipient: user?.idUser },
                         { requester: user?.idUser, recipient: currentUserId }
                     ],
-                    status: 'accepted'
+                    status: { $in: ['accepted', 'pending'] }
                 });
 
                 // Kiểm tra cuộc trò chuyện
