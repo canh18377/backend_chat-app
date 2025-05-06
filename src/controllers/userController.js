@@ -67,6 +67,7 @@ class userController {
             const updated = await User.findOneAndUpdate({ idUser: idUser }, { name: name, email: email, avatar: imageUrls[0] });
             res.json(updated);
         } catch (err) {
+            console.log(err);
             res.status(500).json({ message: err.message });
         }
     };
