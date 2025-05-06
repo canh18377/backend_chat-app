@@ -12,7 +12,7 @@ class conversationController {
             const conversations = await conversation.find({ participants: { $in: [req.user.idUser] } });
 
             if (!conversations || conversations.length === 0) {
-                return res.status(404).json("not found conversation");
+                return res.status(200).json("not found conversation");
             }
             const results = [];
             for (const conv of conversations) {
