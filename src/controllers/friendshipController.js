@@ -150,7 +150,7 @@ class friendShip {
 
     // Lấy danh sách bạn bè đã chấp nhận
     getFriends = async (req, res) => {
-        const userId = req.user.idUser;
+        const userId = req.user.idUser;  // idUser là chuỗi bình thường
 
         try {
             const friends = await Friendship.find({
@@ -158,11 +158,20 @@ class friendShip {
                     { requester: userId, status: 'accepted' },
                     { recipient: userId, status: 'accepted' }
                 ]
-            })
-                .populate({ path: 'requester', select: '-password' })
-                .populate({ path: 'recipient', select: '-password' });
+            });
 
-            res.json(friends);
+            // Lấy thông tin của requester và recipient từ User model
+            const friendDetails = await Promise.all(friends.map(async (friendship) => {
+                const requester = await User.findById(friendship.requester);
+                const recipient = await User.findById(friendship.recipient);
+                return {
+                    ...friendship.toObject(),
+                    requester,
+                    recipient,
+                };
+            }));
+
+            res.json(friendDetails);
 
         } catch (err) {
             res.status(500).json({ message: err.message });
