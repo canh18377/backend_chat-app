@@ -64,6 +64,7 @@ class userController {
         const images = req.files?.avatar || [];
         const imageUrls = await Promise.all(images.map((img) => uploadImage(img.path)))
         try {
+            console.log("k")
             const updated = await User.findOneAndUpdate({ idUser: idUser }, { name: name, email: email, avatar: imageUrls[0] });
             res.json(updated);
         } catch (err) {
