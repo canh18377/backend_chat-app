@@ -17,7 +17,7 @@ class message {
                 });
                 if (!existingConversation) {
                     const conversation = await Conversation.create({
-                        participants: [idUser, ...participants],
+                        participants: [...participants],
                         isGroup: false
                     });
                     conversationId = conversation._id;
