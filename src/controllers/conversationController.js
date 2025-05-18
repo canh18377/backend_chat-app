@@ -35,17 +35,17 @@ class conversationController {
     };
     createConversation = async (req, res) => {
         try {
-            const { participant } = req.body;
+            const participants = JSON.parse(req.body.participants); // ok
             // Kiểm tra tham số
-            if (!participant || !Array.isArray(participant) || participant.length < 2) {
-                return res.status(400).json({ message: "Participant are required and must be at least two users." });
+            if (!participants || !Array.isArray(participants) || participants.length < 2) {
+                return res.status(400).json({ message: "Participants are required and must be at least two users." });
             }
 
             // Nếu là cuộc trò chuyện cá nhân, kiểm tra xem đã tồn tại chưa
             if (!isGroup) {
                 const existingConversation = await conversation.findOne({
                     isGroup: false,
-                    participant: { $all: participant, $size: 2 }
+                    participants: { $all: participants, $size: 2 }
                 });
 
                 if (existingConversation) {
@@ -55,7 +55,7 @@ class conversationController {
 
             // Tạo cuộc trò chuyện mới
             const newConversation = new conversation({
-                participant,
+                participants,
                 isGroup,
                 name: isGroup ? name : null,
                 createdAt: new Date(),
