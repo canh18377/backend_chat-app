@@ -13,7 +13,7 @@ class message {
                 const participants = JSON.parse(data);
                 const existingConversation = await Conversation.findOne({
                     isGroup: false,
-                    participant: { $all: participants }
+                    participants: { $all: participants, $size: 2 }
                 });
                 if (!existingConversation) {
                     const conversation = await Conversation.create({
