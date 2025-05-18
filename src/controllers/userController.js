@@ -61,8 +61,7 @@ class userController {
     updateUser = async (req, res) => {
         const idUser = req.user.idUser
         const { name, email } = req.body
-        const image = req.file.path
-        console.log(req.file.path)
+        const image = req.file?.path
         let imageUrl = null
         if (image) { imageUrl = await uploadImage(image) }
         let updateData = {
