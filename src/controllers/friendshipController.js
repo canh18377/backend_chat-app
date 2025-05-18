@@ -28,7 +28,7 @@ class friendShip {
 
             await friendRequest.save();
 
-            res.status(201).json({ message: 'Friend request sent' });
+            res.status(201).json(friendRequest);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
@@ -118,7 +118,7 @@ class friendShip {
             request.status = 'accepted';
             await request.save();
 
-            res.json({ message: 'Friend request accepted' });
+            res.json(request._id);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
