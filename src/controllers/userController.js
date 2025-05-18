@@ -62,12 +62,14 @@ class userController {
         const idUser = req.user.idUser
         const { name, email } = req.body
         const image = req.file
-        const imageUrl = await uploadImage(image)
+        console.log(req.file)
+        let imageUrl = null
+        if (image) { imageUrl = await uploadImage(image) }
         let updateData = {
             name: name,
             email: email,
         }
-        if (image) {
+        if (imageUrl) {
             updateData.avatar = imageUrl
         }
         try {
