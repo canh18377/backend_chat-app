@@ -61,11 +61,17 @@ class userController {
     updateUser = async (req, res) => {
         const idUser = req.user.idUser
         const { name, email } = req.body
-        console.log(name, email)
-        const images = req.files?.avatar || [];
-        const imageUrls = await Promise.all(images.map((img) => uploadImage(img.path)))
+        const image = req.file
+        const imageUrl = await uploadImage(image)
+        const updateData = {
+            name: name,
+            email: email,
+        }
+        if (image) {
+            updateData.avatar = imageUrl
+        }
         try {
-            const updated = await User.findOneAndUpdate({ idUser: idUser }, { name: name, email: email, avatar: imageUrls[0] }, { new: true });
+            const updated = await User.findOneAndUpdate({ idUser: idUser }, updateData, { new: true });
             const newInfo = updated.toObject()
             delete newInfo.password
             res.json(newInfo);

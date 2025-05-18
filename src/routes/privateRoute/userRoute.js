@@ -8,7 +8,7 @@ router.get('/me', userController.getCurrentUser);
 router.get('/getUsers/:searchBy', userController.getUser);
 router.put(
     '/update',
-    upload.fields([{ name: 'avatar', maxCount: 1 }]),
+    upload.single("avatar"),
     userController.updateUser
 );
 router.delete('/delete', userController.deleteUser);
