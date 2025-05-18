@@ -1,6 +1,6 @@
 const Message = require('../models/message'); // Đảm bảo đã có model Message
 const Conversation = require('../models/conversation'); // Model Conversation
-
+const { uploadImage } = require("../utils/upload_to_cloudinary")
 class message {
     async getMessage(req, res) {
         try {
@@ -90,6 +90,19 @@ class message {
             throw err;
         }
     };
+    async saveImage(req, res) {
+        try {
+            const image = req.file?.path
+            if (!image) {
+                return res.status.json("")
+            }
+            const imageUrl = await uploadImage(image)
+            res.status(200).json(imageUrl)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
+    }
 
 }
 module.exports = new message
