@@ -63,7 +63,7 @@ class userController {
         const { name, email } = req.body
         const image = req.file
         const imageUrl = await uploadImage(image)
-        const updateData = {
+        let updateData = {
             name: name,
             email: email,
         }
