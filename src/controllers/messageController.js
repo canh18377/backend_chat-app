@@ -6,19 +6,22 @@ class message {
         try {
             const idUser = req.user.idUser;
             const { data, exist } = req.params;
-
             let conversationId;
-
+            console.log(data)
             if (exist === 'false') {
                 // Parse data thành mảng participants
                 const participants = JSON.parse(data);
-
-                const conversation = await Conversation.create({
-                    participants: [idUser, ...participants],
-                    isGroup: false
+                const existingConversation = await Conversation.findOne({
+                    isGroup: false,
+                    participant: { $all: participants }
                 });
-
-                conversationId = conversation._id;
+                if (!existingConversation) {
+                    const conversation = await Conversation.create({
+                        participants: [idUser, ...participants],
+                        isGroup: false
+                    });
+                    conversationId = conversation._id;
+                } else conversationId = existingConversation._id;
             } else {
                 // exist === 'true', thì data chính là conversationId
                 conversationId = data;
