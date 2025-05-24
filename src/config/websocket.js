@@ -56,7 +56,7 @@ const config_websoket = (server) => {
             }
             const receiverSocketId = userSocketMap[message.receiver];
             if (receiverSocketId) {
-                io.to(receiverSocketId).emit('receive_message',
+                io.to(receiverSocketId).emit('deleted_message',
                     recalledMess
                 );
                 console.log(`📤 ${senderId} -> ${receiver}: ${message}`);
