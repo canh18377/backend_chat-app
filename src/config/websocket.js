@@ -49,6 +49,26 @@ const config_websoket = (server) => {
                 console.log(`📥 Lưu tin nhắn chờ: ${senderId} -> ${receiverId}`);
             }
         });
+        socket.on('deleteMessage', async (message) => {
+            const recalledMess = await messageController.recalledMessage(message._id);
+            if (recalledMess) {
+                socket.emit("deleted_message", recalledMess)
+            }
+            const receiverSocketId = userSocketMap[message.receiver];
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('receive_message',
+                    recalledMess
+                );
+                console.log(`📤 ${senderId} -> ${receiver}: ${message}`);
+            } else {
+                // Người nhận chưa online → lưu vào pendingMessages
+                if (!pendingMessages[message.receiver]) {
+                    pendingMessages[message.receiver] = [];
+                }
+                pendingMessages[message.receiver].push({ senderId, message });
+                console.log(`📥 Lưu tin nhắn chờ: ${senderId} -> ${message.receiver}`);
+            }
+        });
 
         socket.on('group_message', ({ senderId, receiverIds, message, groupName, groupAvatar }) => {
             // Lưu tin nhắn nhóm vào cơ sở dữ liệu
