@@ -59,14 +59,14 @@ const config_websoket = (server) => {
                 io.to(receiverSocketId).emit('deleted_message',
                     recalledMess
                 );
-                console.log(`📤 ${senderId} -> ${receiver}: ${message}`);
+                console.log(`📤 ${message.senderId} -> ${receiver}: ${message}`);
             } else {
                 // Người nhận chưa online → lưu vào pendingMessages
                 if (!pendingMessages[message.receiver]) {
                     pendingMessages[message.receiver] = [];
                 }
-                pendingMessages[message.receiver].push({ senderId, message });
-                console.log(`📥 Lưu tin nhắn chờ: ${senderId} -> ${message.receiver}`);
+                pendingMessages[message.receiver].push({ senderId: message.sender, message });
+                console.log(`📥 Lưu tin nhắn chờ: ${message.senderId} -> ${message.receiver}`);
             }
         });
 
