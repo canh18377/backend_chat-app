@@ -38,14 +38,19 @@ class message {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
-    // updateMessage = async (newMessage) => {
-    //     try {
-    //         const 
-    //     } catch (error) {
-    //         console.error("Error update message:", err);
-    //         throw err;
-    //     }
-    // }
+    updateMessage = async (messageId, newMessage) => {
+        try {
+            const updatedMessage = await Message.findOneAndUpdate(
+                { _id: messageId },
+                { content: newMessage },
+                { new: true }
+            );
+            return updatedMessage;
+        } catch (error) {
+            console.error("Error updating message:", error);
+            return false;
+        }
+    };
 
     recalledMessage = async (messageId) => {
         try {

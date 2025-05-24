@@ -69,6 +69,24 @@ const config_websoket = (server) => {
                 console.log(`📥 Lưu tin nhắn chờ: ${message.senderId} -> ${message.receiver}`);
             }
         });
+        socket.on('updateMessage', async ({ item, updateMessage }) => {
+            const newMessage = await messageController.updateMessage(item._id, updateMessage);
+            if (newMessage) {
+                socket.emit("updated_message", newMessage)
+            }
+            const receiverSocketId = userSocketMap[item.receiver];
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('updated_message',
+                    newMessage
+                );
+            } else {
+                // Người nhận chưa online → lưu vào pendingMessages
+                if (!pendingMessages[item.receiver]) {
+                    pendingMessages[item.receiver] = [];
+                }
+                pendingMessages[item.receiver].push({ senderId: item.sender, newMessage });
+            }
+        });
 
         socket.on('group_message', ({ senderId, receiverIds, message, groupName, groupAvatar }) => {
             // Lưu tin nhắn nhóm vào cơ sở dữ liệu
