@@ -25,7 +25,7 @@ class conversationController {
                 } else {
                     const receiverId = conv.participants.find(id => id !== req.user.idUser);
                     const user = await User.findOne({ idUser: receiverId });
-                    const plainUser = user.toObject();
+                    const plainUser = user.toObject(); 
                     delete plainUser.password;
                     results.push({ conversation: conv, lastMessage, plainUser });
                 }
@@ -41,9 +41,6 @@ class conversationController {
     createConversation = async (req, res) => {
         try {
             const { participants, isGroup, name } = req.body; 
-            
-            console.log('Request body:', req.body);
-            console.log('File:', req.file);
             
             if (!participants || participants.length < 2) {
                 return res.status(400).json({ message: "Participants are required and must be at least two users." });
@@ -96,12 +93,18 @@ class conversationController {
             });
 
             const savedConversation = await newConversation.save();
-            
-            // Populate thông tin participants để trả về
-            const populatedConversation = await conversation.findById(savedConversation._id)
-                .populate('participants', 'idUser name avatar');
 
-            res.status(201).json(populatedConversation);
+            // Populate thủ công 
+            const participantUsers = await User.find({ 
+                idUser: { $in: savedConversation.participants } 
+            }, 'idUser name avatar');
+
+            const responseData = {
+                ...savedConversation.toObject(),
+                participantDetails: participantUsers
+            };
+
+            res.status(201).json(responseData);
 
         } catch (err) {
             console.error('Create conversation error:', err);
