@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const conversation = require("../models/conversation")
 const messages = require("../models/message");
+const cloudinary = require('../config/cloudinary'); 
+const fs = require('fs');
+
 class conversationController {
     // Lấy thông tin người dùng hiện tại
     getConversations = async (req, res) => {
@@ -22,7 +25,7 @@ class conversationController {
                 } else {
                     const receiverId = conv.participants.find(id => id !== req.user.idUser);
                     const user = await User.findOne({ idUser: receiverId });
-                    const plainUser = user.toObject(); // hoặc user.toJSON()
+                    const plainUser = user.toObject();
                     delete plainUser.password;
                     results.push({ conversation: conv, lastMessage, plainUser });
                 }
@@ -33,41 +36,83 @@ class conversationController {
             res.status(500).json({ message: err.message });
         }
     };
+
     // Tạo cuộc trò chuyện nhóm
     createConversation = async (req, res) => {
-  try {
-    const { participant, isGroup, name } = req.body; 
+        try {
+            const { participants, isGroup, name } = req.body; 
+            
+            console.log('Request body:', req.body);
+            console.log('File:', req.file);
+            
+            if (!participants || participants.length < 2) {
+                return res.status(400).json({ message: "Participants are required and must be at least two users." });
+            }
 
-    if (!participant || !Array.isArray(participant) || participant.length < 2) {
-      return res.status(400).json({ message: "Participants are required and must be at least two users." });
-    }
+            let participantList = participants;
+            if (typeof participants === 'string') {
+                participantList = [participants];
+            }
+            
+            if (!isGroup || isGroup === 'false') {
+                const existingConversation = await conversation.findOne({
+                    isGroup: false,
+                    participants: { $all: participantList, $size: participantList.length }
+                });
 
-    if (!isGroup) {
-      const existingConversation = await conversation.findOne({
-        isGroup: false,
-        participant: { $all: participant, $size: 2 }
-      });
+                if (existingConversation) {
+                    return res.status(200).json({ 
+                        message: "Conversation already exists", 
+                        conversation: existingConversation 
+                    });
+                }
+            }
 
-      if (existingConversation) {
-        return res.status(200).json({ message: "Conversation already exists", conversation: existingConversation });
-      }
-    }
+            let groupAvatarUrl = null;
 
-    const newConversation = new conversation({
-      participant,
-      isGroup,
-      name: isGroup ? name : null,
-      createdAt: new Date(),
-    });
+            if (req.file) {
+                try {
+                    const result = await cloudinary.uploader.upload(req.file.path, {
+                        folder: 'group_avatars',
+                        resource_type: 'image'
+                    });
+                    groupAvatarUrl = result.secure_url;
+                    
+                    fs.unlinkSync(req.file.path);
+                } catch (uploadError) {
+                    console.error('Upload avatar error:', uploadError);
+                    if (fs.existsSync(req.file.path)) {
+                        fs.unlinkSync(req.file.path);
+                    }
+                }
+            }
 
-    const savedConversation = await newConversation.save();
-    res.status(201).json(savedConversation);
+            const newConversation = new conversation({
+                participants: participantList,
+                isGroup: isGroup === 'true' || isGroup === true,
+                name: (isGroup === 'true' || isGroup === true) ? name : null,
+                groupAvatar: groupAvatarUrl,
+                createdAt: new Date(),
+            });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message });
-  }
-};
+            const savedConversation = await newConversation.save();
+            
+            // Populate thông tin participants để trả về
+            const populatedConversation = await conversation.findById(savedConversation._id)
+                .populate('participants', 'idUser name avatar');
 
+            res.status(201).json(populatedConversation);
+
+        } catch (err) {
+            console.error('Create conversation error:', err);
+            
+            if (req.file && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            
+            res.status(500).json({ message: err.message });
+        }
+    };
 }
+
 module.exports = new conversationController();
