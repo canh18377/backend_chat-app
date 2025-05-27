@@ -3,7 +3,6 @@ const router = express.Router();
 const conversationController = require('../../controllers/conversationController');
 const upload = require("../../middlewares/multer")
 router.get('/', conversationController.getConversations);
-
-router.post('/create-group', upload.single('avatar'), conversationController.createConversation);
+router.post('/create-group', conversationController.createConversation);
 
 module.exports = router;
