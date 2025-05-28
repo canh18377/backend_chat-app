@@ -108,34 +108,49 @@ const config_websoket = (server) => {
                 }
             });
         });
-        socket.on("start_call_audio", async ({ toUserId, fromUserId }) => {
+        socket.on("start_call_audio", async ({ toUserId, fromUserId, name = null, groupAvatar = null }) => {
             const result = await call.call_start({ toUserId, fromUserId });
-
             const { channelName, from, to } = result;
 
-            const caller = await User.findOne({ idUser: fromUserId })
-            const receiver = await User.findOne({ idUser: toUserId })
+            const caller = await User.findOne({ idUser: fromUserId });
 
             socket.emit("receive_token", {
                 channelName,
                 uid: from.uid,
                 token: from.token,
-                receiverName: receiver.name,
-                receiverAvatar: receiver.avatar
+                receiverName: Array.isArray(toUserId) ? name : to.name,
+                receiverAvatar: Array.isArray(toUserId) ? groupAvatar : to.avatar
             });
 
-            // Gửi token + channel cho người nhận nếu họ đang online
-            const toSocketId = userSocketMap[toUserId];
-            if (toSocketId) {
-                io.to(toSocketId).emit("receive_token", {
-                    channelName,
-                    uid: to.uid,
-                    token: to.token,
-                    callerName: caller.name,
-                    callerAvatar: caller.avatar,
-                });
+            if (Array.isArray(to)) {
+                for (const receiver of to) {
+                    const toSocketId = userSocketMap[receiver.uid];
+                    if (toSocketId) {
+                        io.to(toSocketId).emit("receive_token", {
+                            channelName,
+                            uid: receiver.uid,
+                            token: receiver.token,
+                            callerName: caller.name,
+                            callerAvatar: caller.avatar,
+                        });
+                    }
+                }
+            } else {
+                // Gọi đơn: gửi token cho người nhận nếu họ đang online
+                const toSocketId = userSocketMap[to.uid];
+                const receiver = await User.findOne({ idUser: to.uid });
+                if (toSocketId) {
+                    io.to(toSocketId).emit("receive_token", {
+                        channelName,
+                        uid: to.uid,
+                        token: to.token,
+                        callerName: caller.name,
+                        callerAvatar: caller.avatar,
+                    });
+                }
             }
         });
+
         socket.on('disconnect', () => {
             const userId = Object.keys(userSocketMap).find(
                 (key) => userSocketMap[key] === socket.id
