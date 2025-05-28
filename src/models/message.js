@@ -12,7 +12,7 @@ const MessageSchema = new mongoose.Schema({
         required: true
     },
     receiver: {
-        type: String,
+        type: mongoose.Schema.Types.Mixed,
         ref: 'User', // hoặc có thể là group chat, tùy thuộc ứng dụng của bạn
         required: true
     },
