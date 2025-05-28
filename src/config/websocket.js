@@ -92,8 +92,9 @@ const config_websoket = (server) => {
             // Lưu tin nhắn nhóm vào cơ sở dữ liệu
             const isGroup = true
             const newMessage = await messageController.createMessage(senderId, receiverIds, message, isGroup, groupName, groupAvatar)
-
-            // Gửi tin nhắn cho tất cả thành viên nhóm
+            if (newMessage) {
+                socket.emit("receive_message", newMessage)
+            }
             receiverIds.forEach((receiverId) => {
                 const receiverSocketId = userSocketMap[receiverId];
                 if (receiverSocketId) {
