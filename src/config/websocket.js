@@ -88,78 +88,68 @@ const config_websoket = (server) => {
             }
         });
 
-        socket.on('group_message', ({ senderId, receiverIds, message, groupName, groupAvatar }) => {
+        socket.on('group_message', async ({ senderId, receiverIds, message, groupName, groupAvatar }) => {
             // Lưu tin nhắn nhóm vào cơ sở dữ liệu
             const isGroup = true
-            messageController.createMessage(senderId, receiverIds, message, isGroup, groupName, groupAvatar)
-                .then((newMessage) => {
-                    Conversation.findOneAndUpdate(
-                        { name: groupName, participants: { $all: receiverIds } },
-                        { $set: { lastMessage: newMessage._id } },
-                        { new: true }
+            const newMessage = await messageController.createMessage(senderId, receiverIds, message, isGroup, groupName, groupAvatar)
+            // Gửi tin nhắn cho tất cả thành viên nhóm
+            receiverIds.forEach((receiverId) => {
+                const receiverSocketId = userSocketMap[receiverId];
+                if (receiverSocketId) {
+                    io.to(receiverSocketId).emit('receive_message',
+                        newMessage
                     );
-
-                    // Gửi tin nhắn cho tất cả thành viên nhóm
-                    receiverIds.forEach((receiverId) => {
-                        const receiverSocketId = userSocketMap[receiverId];
-                        if (receiverSocketId) {
-                            io.to(receiverSocketId).emit('receive_message', {
-                                senderId,
-                                message,
-                            });
-                            console.log(`📤 ${senderId} -> ${receiverId}: ${message}`);
-                        } else {
-                            // Lưu tin nhắn vào pendingMessages nếu người nhận chưa online
-                            if (!pendingMessages[receiverId]) {
-                                pendingMessages[receiverId] = [];
-                            }
-                            pendingMessages[receiverId].push({ senderId, message });
-                            console.log(`📥 Lưu tin nhắn chờ cho nhóm: ${senderId} -> ${receiverId}`);
-                        }
-                    });
-                })
-                .catch((err) => {
-                    console.error('Error creating group message:', err);
-                });
-        });
-        socket.on("start_call_audio", async ({ toUserId, fromUserId }) => {
-            const result = await call.call_start({ toUserId, fromUserId });
-
-            const { channelName, from, to } = result;
-
-            const caller = await User.findOne({ idUser: fromUserId })
-            const receiver = await User.findOne({ idUser: toUserId })
-
-            socket.emit("receive_token", {
-                channelName,
-                uid: from.uid,
-                token: from.token,
-                receiverName: receiver.name,
-                receiverAvatar: receiver.avatar
+                } else {
+                    // Lưu tin nhắn vào pendingMessages nếu người nhận chưa online
+                    if (!pendingMessages[receiverId]) {
+                        pendingMessages[receiverId] = [];
+                    }
+                    pendingMessages[receiverId].push({ senderId, message });
+                }
             });
-
-            // Gửi token + channel cho người nhận nếu họ đang online
-            const toSocketId = userSocketMap[toUserId];
-            if (toSocketId) {
-                io.to(toSocketId).emit("receive_token", {
-                    channelName,
-                    uid: to.uid,
-                    token: to.token,
-                    callerName: caller.name,
-                    callerAvatar: caller.avatar,
-                });
-            }
-        });
-        socket.on('disconnect', () => {
-            const userId = Object.keys(userSocketMap).find(
-                (key) => userSocketMap[key] === socket.id
-            );
-            if (userId) {
-                delete userSocketMap[userId];
-                console.log(`❌ User ${userId} disconnected`);
-            }
-        });
+        })
+            .catch((err) => {
+                console.error('Error creating group message:', err);
+            });
     });
+    socket.on("start_call_audio", async ({ toUserId, fromUserId }) => {
+        const result = await call.call_start({ toUserId, fromUserId });
+
+        const { channelName, from, to } = result;
+
+        const caller = await User.findOne({ idUser: fromUserId })
+        const receiver = await User.findOne({ idUser: toUserId })
+
+        socket.emit("receive_token", {
+            channelName,
+            uid: from.uid,
+            token: from.token,
+            receiverName: receiver.name,
+            receiverAvatar: receiver.avatar
+        });
+
+        // Gửi token + channel cho người nhận nếu họ đang online
+        const toSocketId = userSocketMap[toUserId];
+        if (toSocketId) {
+            io.to(toSocketId).emit("receive_token", {
+                channelName,
+                uid: to.uid,
+                token: to.token,
+                callerName: caller.name,
+                callerAvatar: caller.avatar,
+            });
+        }
+    });
+    socket.on('disconnect', () => {
+        const userId = Object.keys(userSocketMap).find(
+            (key) => userSocketMap[key] === socket.id
+        );
+        if (userId) {
+            delete userSocketMap[userId];
+            console.log(`❌ User ${userId} disconnected`);
+        }
+    });
+});
 };
 
 module.exports = config_websoket;
