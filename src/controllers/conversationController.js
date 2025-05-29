@@ -49,7 +49,11 @@ class conversationController {
 
             let participantList = participants;
             if (typeof participants === 'string') {
-                participantList = [participants];
+                try {
+                    participantList = JSON.parse(participants);
+                } catch (e) {
+                    participantList = [];
+                }
             }
             let groupAvatarUrl = null;
 
