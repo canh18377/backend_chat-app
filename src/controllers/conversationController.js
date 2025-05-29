@@ -59,7 +59,9 @@ class conversationController {
 
             if (req.file) {
                 try {
+                    console.log(req.file.path)
                     const result = await uploadImage(req.file.path)
+                    console.log(result)
                     groupAvatarUrl = result || null;
                 } catch (uploadError) {
                     console.log(uploadError)
