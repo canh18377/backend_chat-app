@@ -57,7 +57,6 @@ class conversationController {
                 try {
                     const result = await uploadImage(req.file.path)
                     groupAvatarUrl = result || null;
-
                 } catch (uploadError) {
                     console.log(uploadError)
                 }
@@ -77,11 +76,6 @@ class conversationController {
 
         } catch (err) {
             console.error('Create conversation error:', err);
-
-            if (req.file && fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
-            }
-
             res.status(500).json({ message: err.message });
         }
     };
