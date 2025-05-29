@@ -1,8 +1,9 @@
 const User = require('../models/user');
 const conversation = require("../models/conversation")
 const messages = require("../models/message");
-const cloudinary = require('../config/cloudinary');
+const { uploadImage } = require("../utils/upload_to_cloudinary")
 const fs = require('fs');
+const upload = require('../middlewares/multer');
 
 class conversationController {
     // Lấy thông tin người dùng hiện tại
@@ -54,18 +55,11 @@ class conversationController {
 
             if (req.file) {
                 try {
-                    const result = await cloudinary.uploader.upload(req.file.path, {
-                        folder: 'group_avatars',
-                        resource_type: 'image'
-                    });
-                    groupAvatarUrl = result.secure_url;
+                    const result = await uploadImage(req.file.path)
+                    groupAvatarUrl = result || null;
 
-                    fs.unlinkSync(req.file.path);
                 } catch (uploadError) {
-                    console.error('Upload avatar error:', uploadError);
-                    if (fs.existsSync(req.file.path)) {
-                        fs.unlinkSync(req.file.path);
-                    }
+                    console.log(uploadError)
                 }
             }
 
