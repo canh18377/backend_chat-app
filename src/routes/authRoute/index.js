@@ -1,8 +1,8 @@
 const OAuthRouter = require('./open-auth');
-const logoutRouter = require('./logout');
+const { router: logoutRouter } = require('./logout');
 function authRoute(app) {
     app.use("/api/auth", OAuthRouter);
-    app.use("/api/auth", logoutRouter); // Thêm logout route
+    app.use("/api/auth", logoutRouter);
 
 }
 module.exports = authRoute;
